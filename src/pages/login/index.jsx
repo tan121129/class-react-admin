@@ -1,24 +1,32 @@
 import React, { Component } from 'react';
 import { Form, Icon, Input, Button } from 'antd';
+import { reqLogin } from '../../api';
 
-import logo from './logo.png';
+import logo from '../../assets/images/logo.png';
 import './index.less';
 
 const Item = Form.Item;
 
 class Login extends Component {
-
   login = (e) => {
     e.preventDefault();
-    this.props.form.validateFields((error, values) => {
+    this.props.form.validateFields(async (error, values) => {
       if (!error) {
         const { username, password } = values;
-        console.log(username, password);
+        const result = await reqLogin(username, password);
+
+        if (result) {
+          this.props.history.replace('/');
+        } else {
+          this.props.form.resetFields(['password']);
+        }
+
       } else {
         console.log('登录表单校验失败：', error);
       }
     })
   }
+
 
   validator = (rule, value, callback) => {
 
@@ -40,7 +48,9 @@ class Login extends Component {
   }
 
   render() {
+
     const { getFieldDecorator } = this.props.form;
+
     return <div className="login">
       <header className="login-header">
         <img src={logo} alt="logo"/>
